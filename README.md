@@ -128,6 +128,3 @@ Full request/response documentation in [API.md](API.md).
 3. Run both the frontend and backend locally and verify your change before opening a PR.
 4. Open a pull request describing the change and any trade-offs.
 
-## License
-
-MIT
