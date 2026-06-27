@@ -1,7 +1,7 @@
 const fs = require("fs");
 const path = require("path");
 
-const DB_FILE = path.join(__dirname, "data", "todos.json");
+const DB_FILE = path.join(__dirname, "..", "data", "todos.json");
 
 function ensureDb() {
   const dir = path.dirname(DB_FILE);
