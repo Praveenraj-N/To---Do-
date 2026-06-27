@@ -1,65 +1,46 @@
 import { useEffect, useState } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
-import { getTodo, updateTodo, deleteTodo } from '../api'
+import { toast } from 'react-toastify'
+import useTodo from '../hooks/useTodo'
+import Spinner from '../components/Spinner'
+import ConfirmDialog from '../components/ConfirmDialog'
+import { PRIORITIES, CATEGORIES } from '../constants'
+import { formatDateTime } from '../utils/date'
 
 export default function TodoDetailPage() {
   const [searchParams] = useSearchParams()
   const id = searchParams.get('id')
   const navigate = useNavigate()
 
-  const [todo, setTodo] = useState(null)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState('')
+  const { todo, loading, error, saveTodo, removeTodo } = useTodo(id)
   const [saving, setSaving] = useState(false)
+  const [confirmOpen, setConfirmOpen] = useState(false)
 
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
   const [priority, setPriority] = useState('medium')
+  const [category, setCategory] = useState('general')
   const [dueDate, setDueDate] = useState('')
   const [completed, setCompleted] = useState(false)
 
   useEffect(() => {
-    if (!id) {
-      setError('No todo id provided in the URL.')
-      setLoading(false)
-      return
-    }
-    loadTodo()
-  }, [id])
-
-  async function loadTodo() {
-    try {
-      setLoading(true)
-      const data = await getTodo(id)
-      setTodo(data)
-      setTitle(data.title)
-      setDescription(data.description || '')
-      setPriority(data.priority)
-      setDueDate(data.dueDate || '')
-      setCompleted(data.completed)
-      setError('')
-    } catch (err) {
-      setError(err.message)
-    } finally {
-      setLoading(false)
-    }
-  }
+    if (!todo) return
+    setTitle(todo.title)
+    setDescription(todo.description || '')
+    setPriority(todo.priority)
+    setCategory(todo.category || 'general')
+    setDueDate(todo.dueDate || '')
+    setCompleted(todo.completed)
+  }, [todo])
 
   async function handleSave(e) {
     e.preventDefault()
     try {
       setSaving(true)
-      const updated = await updateTodo(id, {
-        title,
-        description,
-        priority,
-        dueDate: dueDate || null,
-        completed,
-      })
-      setTodo(updated)
-      setError('')
+      await saveTodo({ title, description, priority, category, dueDate: dueDate || null, completed })
+      toast.success('Todo updated')
     } catch (err) {
-      setError(err.message)
+      toast.error(err.message)
     } finally {
       setSaving(false)
     }
@@ -67,10 +48,13 @@ export default function TodoDetailPage() {
 
   async function handleDelete() {
     try {
-      await deleteTodo(id)
+      await removeTodo()
+      toast.success('Todo deleted')
       navigate('/')
     } catch (err) {
-      setError(err.message)
+      toast.error(err.message)
+    } finally {
+      setConfirmOpen(false)
     }
   }
 
@@ -82,7 +66,7 @@ export default function TodoDetailPage() {
       {error && <div className="error-banner">{error}</div>}
 
       {loading ? (
-        <p>Loading...</p>
+        <Spinner label="Loading todo…" />
       ) : todo ? (
         <div className="detail-card">
           <form onSubmit={handleSave}>
@@ -101,13 +85,24 @@ export default function TodoDetailPage() {
               />
             </div>
 
-            <div className="detail-field">
-              <label htmlFor="priority">Priority</label>
-              <select id="priority" value={priority} onChange={(e) => setPriority(e.target.value)}>
-                <option value="low">Low</option>
-                <option value="medium">Medium</option>
-                <option value="high">High</option>
-              </select>
+            <div className="detail-row">
+              <div className="detail-field">
+                <label htmlFor="priority">Priority</label>
+                <select id="priority" value={priority} onChange={(e) => setPriority(e.target.value)}>
+                  {PRIORITIES.map((p) => (
+                    <option key={p} value={p}>{p.charAt(0).toUpperCase() + p.slice(1)}</option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="detail-field">
+                <label htmlFor="category">Category</label>
+                <select id="category" value={category} onChange={(e) => setCategory(e.target.value)}>
+                  {CATEGORIES.map((c) => (
+                    <option key={c} value={c}>{c.charAt(0).toUpperCase() + c.slice(1)}</option>
+                  ))}
+                </select>
+              </div>
             </div>
 
             <div className="detail-field">
@@ -135,19 +130,27 @@ export default function TodoDetailPage() {
               <button type="submit" className="btn-primary" disabled={saving}>
                 {saving ? 'Saving...' : 'Save changes'}
               </button>
-              <button type="button" className="btn-danger" onClick={handleDelete}>
+              <button type="button" className="btn-danger" onClick={() => setConfirmOpen(true)}>
                 Delete
               </button>
             </div>
           </form>
 
           <div className="meta-row">
-            <span>Created: {new Date(todo.createdAt).toLocaleString()}</span>
-            <span>Updated: {new Date(todo.updatedAt).toLocaleString()}</span>
+            <span>Created: {formatDateTime(todo.createdAt)}</span>
+            <span>Updated: {formatDateTime(todo.updatedAt)}</span>
             <span>ID: {todo.id}</span>
           </div>
         </div>
       ) : null}
+
+      <ConfirmDialog
+        open={confirmOpen}
+        title="Delete todo?"
+        message={todo ? `"${todo.title}" will be permanently deleted.` : ''}
+        onConfirm={handleDelete}
+        onCancel={() => setConfirmOpen(false)}
+      />
     </div>
   )
 }

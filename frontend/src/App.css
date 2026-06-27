@@ -1,13 +1,13 @@
 .app {
   max-width: 720px;
+  width: 100%;
   margin: 0 auto;
   padding: 2rem 1.5rem 4rem;
-  font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
-  color: #1f2330;
+  flex: 1;
 }
 
 a {
-  color: #4f46e5;
+  color: var(--accent);
   text-decoration: none;
 }
 
@@ -21,7 +21,7 @@ h1 {
 }
 
 .subtitle {
-  color: #6b7280;
+  color: var(--text-muted);
   margin-bottom: 1.5rem;
 }
 
@@ -35,28 +35,35 @@ h1 {
   font-size: 0.9rem;
 }
 
-.add-form {
+.add-form,
+.toolbar {
   display: flex;
   gap: 0.5rem;
   margin-bottom: 1.25rem;
   flex-wrap: wrap;
 }
 
-.add-form input[type="text"] {
+.add-form input[type='text'],
+.search-input {
   flex: 1;
   min-width: 180px;
   padding: 0.6rem 0.75rem;
-  border: 1px solid #d1d5db;
+  border: 1px solid var(--border);
   border-radius: 8px;
   font-size: 0.95rem;
+  background: var(--surface);
+  color: var(--text);
 }
 
 .add-form select,
-.add-form input[type="date"] {
+.add-form input[type='date'],
+.toolbar select {
   padding: 0.6rem 0.5rem;
-  border: 1px solid #d1d5db;
+  border: 1px solid var(--border);
   border-radius: 8px;
   font-size: 0.9rem;
+  background: var(--surface);
+  color: var(--text);
 }
 
 button {
@@ -68,22 +75,27 @@ button {
   font-weight: 500;
 }
 
+button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 .btn-primary {
-  background: #4f46e5;
+  background: var(--accent);
   color: white;
 }
 
 .btn-primary:hover {
-  background: #4338ca;
+  background: var(--accent-hover);
 }
 
 .btn-secondary {
-  background: #e5e7eb;
-  color: #1f2330;
+  background: var(--bg-muted);
+  color: var(--text);
 }
 
 .btn-secondary:hover {
-  background: #d1d5db;
+  background: var(--border);
 }
 
 .btn-danger {
@@ -102,14 +114,14 @@ button {
 }
 
 .filters button {
-  background: #f3f4f6;
-  color: #374151;
+  background: var(--bg-muted);
+  color: var(--text-muted);
   font-size: 0.85rem;
   padding: 0.4rem 0.8rem;
 }
 
 .filters button.active {
-  background: #4f46e5;
+  background: var(--accent);
   color: white;
 }
 
@@ -125,29 +137,38 @@ button {
   display: flex;
   align-items: center;
   gap: 0.6rem;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--border);
   border-radius: 10px;
   padding: 0.7rem 0.9rem;
-  background: white;
+  background: var(--surface);
+  flex-wrap: wrap;
 }
 
 .todo-item.completed .todo-title {
   text-decoration: line-through;
-  color: #9ca3af;
+  color: var(--text-muted);
 }
 
 .todo-title {
   flex: 1;
   font-weight: 500;
   cursor: pointer;
+  color: var(--text);
+  min-width: 120px;
 }
 
-.priority-badge {
+.priority-badge,
+.category-badge {
   font-size: 0.7rem;
   font-weight: 600;
   text-transform: uppercase;
   padding: 0.15rem 0.5rem;
   border-radius: 999px;
+}
+
+.category-badge {
+  background: var(--bg-muted);
+  color: var(--text-muted);
 }
 
 .priority-low {
@@ -167,11 +188,11 @@ button {
 
 .due-date {
   font-size: 0.75rem;
-  color: #6b7280;
+  color: var(--text-muted);
 }
 
 .empty-state {
-  color: #6b7280;
+  color: var(--text-muted);
   text-align: center;
   padding: 2rem 0;
 }
@@ -182,14 +203,23 @@ button {
 }
 
 .detail-card {
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--border);
   border-radius: 12px;
   padding: 1.5rem;
-  background: white;
+  background: var(--surface);
 }
 
 .detail-card h2 {
   margin-top: 0;
+}
+
+.detail-row {
+  display: flex;
+  gap: 1rem;
+}
+
+.detail-row .detail-field {
+  flex: 1;
 }
 
 .detail-field {
@@ -199,21 +229,23 @@ button {
 .detail-field label {
   display: block;
   font-size: 0.8rem;
-  color: #6b7280;
+  color: var(--text-muted);
   margin-bottom: 0.25rem;
 }
 
 .detail-field textarea,
-.detail-field input[type="text"],
+.detail-field input[type='text'],
 .detail-field select,
-.detail-field input[type="date"] {
+.detail-field input[type='date'] {
   width: 100%;
   padding: 0.5rem 0.65rem;
-  border: 1px solid #d1d5db;
+  border: 1px solid var(--border);
   border-radius: 8px;
   font-size: 0.95rem;
   font-family: inherit;
   box-sizing: border-box;
+  background: var(--bg);
+  color: var(--text);
 }
 
 .detail-actions {
@@ -226,6 +258,44 @@ button {
   display: flex;
   gap: 1.5rem;
   font-size: 0.8rem;
-  color: #9ca3af;
+  color: var(--text-muted);
   margin-top: 1rem;
+  flex-wrap: wrap;
+}
+
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 1.25rem;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.not-found {
+  text-align: center;
+  padding: 4rem 0;
+}
+
+.not-found h1 {
+  font-size: 4rem;
+  margin-bottom: 0.5rem;
+}
+
+@media (max-width: 560px) {
+  .add-form,
+  .toolbar {
+    flex-direction: column;
+  }
+
+  .add-form select,
+  .add-form input[type='date'],
+  .toolbar select {
+    width: 100%;
+  }
+
+  .detail-row {
+    flex-direction: column;
+  }
 }
